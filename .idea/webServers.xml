@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="5986572f-6792-4a1b-bcb4-797086329138" name="测试环境" url="http://47.107.235.77:8019/pmp">
+        <fileTransfer host="47.107.235.77" port="22" rootFolder="/srv/dubbo" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

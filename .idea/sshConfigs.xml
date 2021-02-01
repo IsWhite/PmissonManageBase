@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig authType="PASSWORD" host="47.107.235.77" id="dc2bc65b-b877-4d5a-a7a1-a0053f73aab7" port="22" customName="测试环境" nameFormat="CUSTOM">
+        <option name="customName" value="测试环境" />
+      </sshConfig>
+    </configs>
+  </component>
+</project>

@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>PermissonManagementPlatform</artifactId>
+        <groupId>com.debug.pmp</groupId>
+        <version>1.0.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>server</artifactId>
+    <packaging>jar</packaging>
+
+    <properties>
+        <quartz.version>2.3.0</quartz.version>
+        <shiro.version>1.4.0</shiro.version>
+        <kaptcha.version>0.0.9</kaptcha.version>
+        <swagger.version>2.7.0</swagger.version>
+
+        <qiniu.version>[7.2.0, 7.2.99]</qiniu.version>
+        <aliyun.oss.version>2.5.0</aliyun.oss.version>
+        <qcloud.cos.version>4.4</qcloud.cos.version>
+    </properties>
+
+    <dependencies>
+        <!--依赖model模块-->
+        <dependency>
+            <groupId>com.debug.pmp</groupId>
+            <artifactId>model</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <!--freemarker-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-freemarker</artifactId>
+        </dependency>
+
+        <!--quartz任务调度-->
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+            <version>${quartz.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.mchange</groupId>
+                    <artifactId>c3p0</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.zaxxer</groupId>
+                    <artifactId>HikariCP-java6</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!--shiro-->
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-core</artifactId>
+            <version>${shiro.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-spring</artifactId>
+            <version>${shiro.version}</version>
+        </dependency>
+
+        <!--验证码-->
+        <dependency>
+            <groupId>com.github.axet</groupId>
+            <artifactId>kaptcha</artifactId>
+            <version>${kaptcha.version}</version>
+        </dependency>
+
+        <!--swagger-->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+
+        <!--oss云存储~七牛云-->
+        <dependency>
+            <groupId>com.qiniu</groupId>
+            <artifactId>qiniu-java-sdk</artifactId>
+            <version>${qiniu.version}</version>
+        </dependency>
+
+        <!--oss云存储~阿里云-->
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+            <version>${aliyun.oss.version}</version>
+        </dependency>
+
+        <!--oss云存储~腾讯云-->
+        <dependency>
+            <groupId>com.qcloud</groupId>
+            <artifactId>cos_api</artifactId>
+            <version>${qcloud.cos.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- 引入热部署jar包 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <!-- optional=true,依赖不会传递，该项目依赖devtools；之后依赖该项目的项目如果想要使用devtools，需要重新引入 -->
+            <optional>true</optional>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <finalName>pmp-${project.parent.version}</finalName>
+
+        <!--wagon一键部署运行-->
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>2.8</version>
+            </extension>
+        </extensions>
+
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+
+                <configuration>
+                    <!-- IntelliJ IDEA本地测试去掉fork也生效 -->
+                    <fork>true</fork>
+                </configuration>
+            </plugin>
+            <!-- 跳过单元测试 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+
+
+            <!--wagon一键部署运行-->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>wagon-maven-plugin</artifactId>
+                <version>1.0</version>
+                <configuration>
+                    <!-- serverId即在maven安装目录中conf目录的settings.xml中配置的service的id -->
+                    <serverId>linux-server-dev</serverId>
+                    <!-- 要上传到服务器的文件，一般来说是jar或者war包 -->
+                    <fromFile>E:\\WorkSpaceTeaching\\PermissonManagementPlatform\\server\\target\\pmp-${project.parent.version}.jar</fromFile>
+                    <!-- 配置服务器的地址以及文件上传的目录。 -->
+                    <url>scp://47.107.235.77/srv/dubbo/pmpTest/</url>
+
+                    <commands>
+                        <!--定位到那个目录-->
+                        <command>cd /srv/dubbo/pmpTest/</command>
+                        <!--配置一下软连接~在启动时就不需要依赖于 jar/war 的某个版本号了 -->
+                        <command>ln -sf /srv/dubbo/pmpTest/pmp-1.0.1.jar /srv/dubbo/pmpTest/pmp.jar</command>
+                        <!--执行停止运行、启动运行脚本-->
+                        <command>sh /srv/dubbo/pmpTest/shFiles/pmpCommand.sh</command>
+                    </commands>
+
+                    <!-- 显示运行命令的输出结果 -->
+                    <displayCommandOutputs>true</displayCommandOutputs>
+                </configuration>
+            </plugin>
+
+
+            <!--第二种方式：可以直接点击 maven 的server模块的package命令即可-->
+            <!--<plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>wagon-maven-plugin</artifactId>
+                <version>1.0</version>
+                <executions>
+                    <execution>
+                        <id>upload-deploy</id>
+                        &lt;!&ndash; 运行package打包的同时运行upload-single和sshexec &ndash;&gt;
+                        <phase>package</phase>
+                        <goals>
+                            <goal>upload-single</goal>
+                            <goal>sshexec</goal>
+                        </goals>
+                        <configuration>
+                            <serverId>linux-server-dev</serverId>
+                            &lt;!&ndash; 要上传到服务器的文件，一般来说是jar或者war包 &ndash;&gt;
+                            <fromFile>E:\\WorkSpaceTeaching\\PermissonManagementPlatform\\server\\target\\pmp-${project.parent.version}.jar</fromFile>
+                            &lt;!&ndash; 配置服务器的地址以及文件上传的目录。 &ndash;&gt;
+                            <url>scp://47.107.235.77/srv/dubbo/pmpTest/</url>
+
+                            <commands>
+                                &lt;!&ndash;定位到那个目录&ndash;&gt;
+                                <command>cd /srv/dubbo/pmpTest/</command>
+                                &lt;!&ndash;配置一下软连接~在启动时就不需要依赖于 jar/war 的某个版本号了 &ndash;&gt;
+                                <command>ln -sf /srv/dubbo/pmpTest/pmp-1.0.1.jar /srv/dubbo/pmpTest/pmp.jar</command>
+                                &lt;!&ndash;执行停止运行、启动运行脚本&ndash;&gt;
+                                <command>sh /srv/dubbo/pmpTest/shFiles/pmpCommand.sh</command>
+                            </commands>
+
+                            <displayCommandOutputs>true</displayCommandOutputs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>-->
+
+        </plugins>
+
+    </build>
+
+
+</project>
