@@ -108,7 +108,7 @@ var vm = new Vue({
 					    //登陆失败
 						vm.error = true;
 						vm.errorMsg = result.msg;
-						
+						vm.captcha = '';
 						vm.refreshCode();
 					}
 				}

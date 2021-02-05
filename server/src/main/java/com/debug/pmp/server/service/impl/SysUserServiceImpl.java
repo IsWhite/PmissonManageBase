@@ -76,6 +76,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao,SysUserEntity> im
 
         //获取用户所属的部门、用户的岗位信息
         SysDeptEntity dept;
+        //resPage.getRecords() ???????? 循环获取用户对象进行
         for (SysUserEntity user:resPage.getRecords()){
             try {
                 dept=sysDeptService.getById(user.getDeptId());

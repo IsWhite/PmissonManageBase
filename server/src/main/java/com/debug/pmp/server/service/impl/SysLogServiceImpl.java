@@ -31,7 +31,8 @@ public class SysLogServiceImpl extends ServiceImpl<SysLogDao,SysLogEntity> imple
         QueryWrapper<SysLogEntity> wrapper=new QueryWrapper<SysLogEntity>()
                 .like(StringUtils.isNotBlank(key),"username", key)
                 .or(StringUtils.isNotBlank(key))
-                .like(StringUtils.isNotBlank(key),"operation", key);
+                .like(StringUtils.isNotBlank(key),"operation", key)
+                .orderByDesc("create_date");
         IPage<SysLogEntity> page=this.page(queryPage,wrapper);
 
         return new PageUtil(page);
