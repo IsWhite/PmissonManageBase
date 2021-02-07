@@ -60,7 +60,7 @@ var vm = new Vue({
         categoryList: {},
         category: {
             id: null,
-            categoryame: null,
+            categoryName: null,
             categoryCode: null,
             categoryImg: null,
             orderNum: 0,
@@ -81,7 +81,7 @@ var vm = new Vue({
             vm.showList = true;
             var page = $("#jqGrid").jqGrid('getGridParam', 'page');
             $("#jqGrid").jqGrid('setGridParam', {
-                categoryData: {'search': vm.q.categoryName},
+                postData: {'search': vm.q.categoryName},  //postData是post请求参数Data
                 page: page
             }).trigger("reloadGrid");
         },
@@ -121,7 +121,6 @@ var vm = new Vue({
         //获取详情
         getInfo: function (id) {
             $.get(baseURL + "proc/procCategory/info/" + id, function (r) {
-                console.log(r);
                 vm.category = r.data.category;
             });
         },
@@ -135,6 +134,7 @@ var vm = new Vue({
 
             confirm('确定要删除选中的记录？', function () {
                 var data = JSON.stringify(ids);
+                console.log(data);
                 $.ajax({
                     type: "POST",
                     url: baseURL + "proc/procCategory/delete",

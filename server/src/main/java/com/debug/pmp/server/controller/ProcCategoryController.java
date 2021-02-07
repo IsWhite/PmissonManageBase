@@ -18,6 +18,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,6 +34,8 @@ import java.util.Map;
 public class ProcCategoryController extends AbstractController {
 
     private static final Logger log = LoggerFactory.getLogger(ProcCategoryController.class);
+
+
     @Autowired
     private ProcCategoryService procCategoryService;
 
@@ -41,6 +44,7 @@ public class ProcCategoryController extends AbstractController {
     @RequestMapping("/list")
     @RequiresPermissions("proc:procCategory:list")
     public BaseResponse list(@RequestParam Map<String, Object> paramMap) {
+        log.info("查询提交的数据{}", paramMap);
         BaseResponse response = new BaseResponse(StatusCode.Success);
         Map<String, Object> resMap = Maps.newHashMap();
         try {
@@ -55,7 +59,7 @@ public class ProcCategoryController extends AbstractController {
     }
 
     @LogAnnotation("新增商品类别")
-    @RequestMapping(value = "/save")
+    @RequestMapping(value = "/save",method = RequestMethod.POST)
     @RequiresPermissions("proc:procCategory:save")
     public BaseResponse save(@RequestBody @Validated ProcCategoryEntity categoryEntity, BindingResult result) {
         String res = ValidatorUtil.checkResult(result);
@@ -68,29 +72,63 @@ public class ProcCategoryController extends AbstractController {
             procCategoryService.saveCategory(categoryEntity);
 
         } catch (Exception e) {
-            response = new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());
+            response = new BaseResponse(StatusCode.Fail.getCode(), e.getMessage());
         }
 
         return response;
     }
 
     //详情
-
-    @RequestMapping(value = "/info/{id}")
-    public BaseResponse info(@PathVariable String id){
+    @RequestMapping(value = "/info/{id}",method = RequestMethod.GET)
+    @RequiresPermissions("proc:procCategory:info")
+    public BaseResponse info(@PathVariable String id) {
         log.info(id);
         BaseResponse response = new BaseResponse(StatusCode.Success);
         try {
             ProcCategoryEntity procCategoryEntity = procCategoryService.getById(id);
-            Map<String ,Object> resMaps = Maps.newHashMap();
-            resMaps.put("category",procCategoryEntity);
+            Map<String, Object> resMaps = Maps.newHashMap();
+            resMaps.put("category", procCategoryEntity);
             response.setData(resMaps);
-        }catch (Exception e){
-            response = new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());
+        } catch (Exception e) {
+            response = new BaseResponse(StatusCode.Fail.getCode(), e.getMessage());
         }
-
         return response;
     }
+
+
+    //修改
+    @LogAnnotation("修改商品类别")
+    @RequestMapping(value = "/update",method = RequestMethod.POST)
+    @RequiresPermissions("proc:procCategory:update")
+    public BaseResponse update(@RequestBody @Validated ProcCategoryEntity categoryEntity, BindingResult result) {
+        log.info("修改提交的参数{}", categoryEntity);
+        BaseResponse response = new BaseResponse(StatusCode.Success);
+        try {
+            procCategoryService.updateCategory(categoryEntity);
+        } catch (Exception e) {
+            response = new BaseResponse(StatusCode.Fail.getCode(), e.getMessage());
+        }
+        return response;
+    }
+
+
+
+    //删除
+    @LogAnnotation("删除商品类别")
+    @RequestMapping(value = "/delete",method = RequestMethod.POST)
+    @RequiresPermissions("proc:procCategory:delete")
+    public BaseResponse delete(@RequestBody List<String> ids){
+        log.info("删除的单据{}",ids);
+        BaseResponse response = new BaseResponse(StatusCode.Success);
+        try {
+            procCategoryService.deleteCategory(ids);
+        } catch (Exception e) {
+            response = new BaseResponse(StatusCode.Fail.getCode(), e.getMessage());
+        }
+        return response;
+    }
+
+
 
 }
 

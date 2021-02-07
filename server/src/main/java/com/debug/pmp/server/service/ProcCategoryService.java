@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.debug.pmp.common.utils.PageUtil;
 import com.debug.pmp.model.entity.ProcCategoryEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,4 +21,7 @@ public interface ProcCategoryService extends IService<ProcCategoryEntity> {
 
     void saveCategory(ProcCategoryEntity categoryEntity);
 
+    void updateCategory(ProcCategoryEntity categoryEntity);
+
+    void deleteCategory(List<String> ids);
 }

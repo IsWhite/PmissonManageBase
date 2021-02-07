@@ -3,17 +3,16 @@ package com.debug.pmp.server.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.debug.pmp.common.response.StatusCode;
+import com.debug.pmp.common.utils.CommonUtil;
 import com.debug.pmp.common.utils.PageUtil;
 import com.debug.pmp.common.utils.QueryUtil;
 import com.debug.pmp.model.entity.ProcCategoryEntity;
-import com.debug.pmp.model.entity.SysDeptEntity;
-import com.debug.pmp.model.entity.SysPostEntity;
 import com.debug.pmp.model.entity.SysUserEntity;
 import com.debug.pmp.model.mapper.ProcCategoryDao;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.debug.pmp.server.service.ProcCategoryService;
-import com.debug.pmp.server.service.SysDeptService;
 import com.debug.pmp.server.service.SysUserService;
+import com.debug.pmp.server.shiro.ShiroUtil;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -21,9 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Wrapper;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * <p>
@@ -78,9 +75,36 @@ public class ProcCategoryServiceImpl extends ServiceImpl<ProcCategoryDao, ProcCa
         }
         String uuid = UUID.randomUUID().toString();
         categoryEntity.setId(uuid);
-        categoryEntity.setCreaterId((long) 1);
+        Long userId = ShiroUtil.getUserId();
+        categoryEntity.setCreaterId(userId);
         categoryEntity.setCreateTime(DateTime.now().toDate());
         save(categoryEntity);
 
+    }
+
+    @Override
+    public void updateCategory(ProcCategoryEntity categoryEntity) {
+        ProcCategoryEntity old = this.getById(categoryEntity.getId());
+
+        //如果修改了编码-编码不能与已经有的编码重复
+        //未修改编码,则不需要判断
+        if(old != null && !old.getCategoryCode().equals(categoryEntity.getCategoryCode())){
+            String categoryCode = categoryEntity.getCategoryCode();
+            QueryWrapper<ProcCategoryEntity> wrapper = new QueryWrapper<ProcCategoryEntity>().eq("category_code", categoryCode);
+            ProcCategoryEntity one = this.getOne(wrapper);
+            if (one != null) {
+                throw  new RuntimeException(StatusCode.PostCodeHasExist.getMsg());
+            }
+        }
+        categoryEntity.setReviserTime(DateTime.now().toDate());
+        updateById(categoryEntity);
+
+    }
+
+    @Override
+    public void deleteCategory(List<String> ids) {
+        String str = StringUtils.join(ids,",");
+        String sqlStr = CommonUtil.concatStrToChar(str, ",");
+        baseMapper.removeByCategoryIds(sqlStr);
     }
 }
