@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.generator.config.PackageConfig;
 import com.baomidou.mybatisplus.generator.config.StrategyConfig;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 /**
- * @Author 代码生成器 (需要将controller,server,xml手动粘贴到对应的地方)
+ * @Author 代码生成器 (需要将controller,server包删掉 ，xml 移到mappers包中 ,时间类型改为Date)
  * @Date 2021/2/2
  * @Description
  */
@@ -82,7 +82,7 @@ public class CodeGenerationModel {
         strategy.setNaming(NamingStrategy.underline_to_camel);
 
         // 需要生成的表
-        strategy.setInclude(new String[]{"proc_produces","proc_category","proc_storage"});
+        strategy.setInclude(new String[]{"proc_mold"});
         strategy.setSuperServiceClass(null);
         strategy.setSuperServiceImplClass(null);
         strategy.setSuperMapperClass(null);

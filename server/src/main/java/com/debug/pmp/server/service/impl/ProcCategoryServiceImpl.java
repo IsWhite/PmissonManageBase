@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.debug.pmp.server.service.ProcCategoryService;
 import com.debug.pmp.server.service.SysUserService;
 import com.debug.pmp.server.shiro.ShiroUtil;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -32,8 +33,6 @@ import java.util.*;
  */
 @Service("ProcCategoryService")
 public class ProcCategoryServiceImpl extends ServiceImpl<ProcCategoryDao, ProcCategoryEntity> implements ProcCategoryService {
-
-    private static final Logger log = LoggerFactory.getLogger(SysPostServiceImpl.class);
 
     @Autowired
     private SysUserService sysUserService;
@@ -106,5 +105,23 @@ public class ProcCategoryServiceImpl extends ServiceImpl<ProcCategoryDao, ProcCa
         String str = StringUtils.join(ids,",");
         String sqlStr = CommonUtil.concatStrToChar(str, ",");
         baseMapper.removeByCategoryIds(sqlStr);
+    }
+
+
+    //商品类别所有值（下拉选）
+    @Override
+    public List<Map<String,String>> getAllCategory() {
+        QueryWrapper<ProcCategoryEntity> queryWrapper = new QueryWrapper<ProcCategoryEntity>().orderByAsc("order_num");
+
+        List<ProcCategoryEntity> proCategoryList = list(queryWrapper);
+
+        List<Map<String,String>> list = new ArrayList<>();
+        for (ProcCategoryEntity categoryEntity : proCategoryList){
+            Map<String,String> categoryMap = Maps.newHashMap();
+            categoryMap.put("value",categoryEntity.getId());
+            categoryMap.put("text",categoryEntity.getCategoryName());
+            list.add(categoryMap);
+        }
+        return list;
     }
 }

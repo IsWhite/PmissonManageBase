@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.generator.config.StrategyConfig;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 
 /**
- * @Author 代码生成器 (需要将controller,server,xml手动粘贴到对应的地方)
+ * @Author 代码生成器 (需要将entity,mapper,xml包删掉，并重新引下包路径)
  * @Date 2021/2/2
  * @Description
  */
@@ -83,7 +83,7 @@ public class CodeGenerationServer {
         strategy.setNaming(NamingStrategy.underline_to_camel);
 
         // 需要生成的表
-        strategy.setInclude(new String[]{"proc_produces","proc_category","proc_storage"});
+        strategy.setInclude(new String[]{"proc_mold"});
         strategy.setSuperServiceClass(null);
         strategy.setSuperServiceImplClass(null);
         strategy.setSuperMapperClass(null);
@@ -98,7 +98,7 @@ public class CodeGenerationServer {
         // 包配置
         PackageConfig pc = new PackageConfig();
         //父包路径
-        pc.setParent("com.debug.pmp.model");
+        pc.setParent("com.debug.pmp.server");
         //指定生成文件的上层包名
         pc.setController("controller");
         pc.setService("service");

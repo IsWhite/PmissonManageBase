@@ -24,4 +24,6 @@ public interface ProcCategoryService extends IService<ProcCategoryEntity> {
     void updateCategory(ProcCategoryEntity categoryEntity);
 
     void deleteCategory(List<String> ids);
+
+    List<Map<String,String>> getAllCategory();
 }

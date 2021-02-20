@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.debug.pmp.model.mapper.ProcMoldDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.debug.pmp.model.entity.ProcMoldEntity">
+        <result column="id" property="id" />
+        <result column="category_id" property="categoryId" />
+        <result column="mold_name" property="moldName" />
+        <result column="mold_code" property="moldCode" />
+        <result column="mold_img" property="moldImg" />
+        <result column="creater_id" property="createrId" />
+        <result column="dept_id" property="deptId" />
+        <result column="create_time" property="createTime" />
+        <result column="reviser_time" property="reviserTime" />
+        <result column="order_num" property="orderNum" />
+        <result column="isqy" property="isqy" />
+    </resultMap>
+
+
+    <delete id="removeByMoldIds">
+        DELETE FROM proc_mold WHERE id IN (${ids})
+    </delete>
+</mapper>

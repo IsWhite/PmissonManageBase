@@ -79,3 +79,14 @@ function getSelectedRows() {
 function isBlank(value) {
     return !value || !/\S/.test(value)
 }
+
+//判断是否是数字
+function  isNumber(value){
+	var numReg = /^[0-9]*$/;
+	var numRe = new RegExp(numReg);
+	if (!numRe.test(value)) {
+		return false;
+	}else {
+		return true;
+	}
+}
