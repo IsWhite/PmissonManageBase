@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.debug.pmp.model.mapper.ProcStorageDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.debug.pmp.model.entity.ProcStorageEntity">
+        <result column="id" property="id" />
+        <result column="storage_name" property="storageName" />
+        <result column="storage_code" property="storageCode" />
+        <result column="itsm_status" property="itsmStatus" />
+        <result column="flow_id" property="flowId" />
+        <result column="approver_id" property="approverId" />
+        <result column="storage_area" property="storageArea" />
+        <result column="rent_time" property="rentTime" />
+        <result column="sta_rent_date" property="staRentDate" />
+        <result column="end_rent_date" property="endRentDate" />
+        <result column="rent_price" property="rentPrice" />
+        <result column="renter_id" property="renterId" />
+        <result column="renter_phone" property="renterPhone" />
+        <result column="landlord_id" property="landlordId" />
+        <result column="landlord_phone" property="landlordPhone" />
+        <result column="contract_url" property="contractUrl" />
+        <result column="storage_address" property="storageAddress" />
+        <result column="storage_doorNum" property="storageDoornum" />
+        <result column="is_expire" property="isExpire" />
+        <result column="creater_id" property="createrId" />
+        <result column="dept_id" property="deptId" />
+        <result column="create_time" property="createTime" />
+        <result column="reviser_time" property="reviserTime" />
+        <result column="isqy" property="isqy" />
+    </resultMap>
+
+</mapper>
