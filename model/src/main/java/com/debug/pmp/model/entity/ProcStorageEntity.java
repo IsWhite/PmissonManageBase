@@ -10,11 +10,15 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.NotBlank;
+
+import javax.validation.constraints.Min;
 
 /**
  * <p>
@@ -38,9 +42,11 @@ public class ProcStorageEntity implements Serializable {
     private String id;
 
     @ApiModelProperty(value = "仓库名称")
+    @NotBlank(message ="仓库名称不能为空!" )
     private String storageName;
 
     @ApiModelProperty(value = "仓库编号")
+    @NotBlank(message ="仓库编号不能为空!" )
     private String storageCode;
 
     @ApiModelProperty(value = "申请单状态(-1草稿，1，流转，2办结，3作废)")
@@ -53,28 +59,39 @@ public class ProcStorageEntity implements Serializable {
     private Long approverId;
 
     @ApiModelProperty(value = "仓库面积")
+    @Min(value = 0 ,message = "仓库面积不能小于0") //数字不能小于0
     private BigDecimal storageArea;
 
     @ApiModelProperty(value = "租期")
+    @Min(value = 0 ,message = "租期不能小于0") //数字不能小于0
     private String rentTime;
 
     @ApiModelProperty(value = "起租日期")
+    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd")
     private Date staRentDate;
 
     @ApiModelProperty(value = "到租日期")
+    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd")
     private Date endRentDate;
 
     @ApiModelProperty(value = "租金")
+    @Min(value = 0 ,message = "租金不能小于0") //数字不能小于0
     private BigDecimal rentPrice;
 
     @ApiModelProperty(value = "租户ID")
     private Long renterId;
+
+    @TableField(exist = false) //必须存在的非本表中的字段
+    private String renterName; //创建人名称
 
     @ApiModelProperty(value = "租户电话")
     private String renterPhone;
 
     @ApiModelProperty(value = "房东ID")
     private Long landlordId;
+
+    @TableField(exist = false) //必须存在的非本表中的字段
+    private String landlordName; //创建人名称
 
     @ApiModelProperty(value = "房东电话")
     private String landlordPhone;
@@ -86,7 +103,6 @@ public class ProcStorageEntity implements Serializable {
     private String storageAddress;
 
     @ApiModelProperty(value = "仓库门牌号")
-    @TableField("storage_doorNum")
     private String storageDoornum;
 
     @ApiModelProperty(value = "是否到期 0 未到期")
@@ -95,14 +111,15 @@ public class ProcStorageEntity implements Serializable {
     @ApiModelProperty(value = "创建人ID")
     private Long createrId;
 
+    @TableField(exist = false) //必须存在的非本表中的字段
+    private String createrName; //创建人名称
+
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
     @ApiModelProperty(value = "修改时间")
     private Date reviserTime;
 
-    @ApiModelProperty(value = "是否启用 0 启用")
-    private Integer isqy;
 
 
 }

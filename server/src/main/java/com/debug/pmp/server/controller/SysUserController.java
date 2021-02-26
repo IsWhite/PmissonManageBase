@@ -212,6 +212,22 @@ public class SysUserController extends AbstractController{
         return response;
     }
 
+    //获取用户详情(下拉选)
+    @RequestMapping("/getSelUserinfo/{userId}")
+    public BaseResponse getUserinfo(@PathVariable Long userId){
+        BaseResponse response=new BaseResponse(StatusCode.Success);
+        Map<String,Object> resMap=Maps.newHashMap();
+        try {
+            log.info("用户模块~获取详情：{}",userId);
+
+            resMap.put("user",sysUserService.getInfo(userId));
+            response.setData(resMap);
+        }catch (Exception e){
+            response=new BaseResponse(StatusCode.UpdatePasswordFail);
+        }
+        return response;
+    }
+
 }
 
 

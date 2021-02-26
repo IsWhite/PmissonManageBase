@@ -205,6 +205,50 @@
             <artifactId>springfox-swagger-ui</artifactId>
             <version>${swagger.version}</version>
         </dependency>
+
+        <!--     springboot2+mybatisplus+activiti6集成      -->
+                <dependency>
+                    <groupId>org.activiti</groupId>
+                    <artifactId>activiti-engine</artifactId>
+                    <version>6.0.0</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.mybatis</groupId>
+                            <artifactId>mybatis</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>org.activiti</groupId>
+                    <artifactId>activiti-spring</artifactId>
+                    <version>6.0.0</version>
+                </dependency>
+                <!--junit 测试-->
+                <dependency>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                    <version>4.12</version>
+                    <scope>test</scope>
+                </dependency>
+                <!--logback-->
+                <dependency>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                    <version>1.2.3</version>
+                </dependency>
+                <!--guava组件-->
+                <dependency>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                    <version>23.0</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
+                    <version>1.4.196</version>
+                </dependency>
+        <!--     springboot2+mybatisplus+activiti6集成      -->
+
     </dependencies>
 
     <!-- 阿里云maven仓库 -->
@@ -231,5 +275,5 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
-    
+
 </project>

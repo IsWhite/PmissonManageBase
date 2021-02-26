@@ -17,10 +17,10 @@ $(function () {
             {label: '租户电话', name: 'renterPhone', index: "renter_phone", width: 75},
             {label: '房东姓名', name: 'landlordName', index: "landlord_name", width: 75},
             {label: '房东电话', name: 'landlordPhone', index: "landlord_phone", width: 75},
-            {label: '仓库门牌号', name: 'storageDoorNum', index: "storage_doorNum", width: 75},
+            {label: '仓库门牌号', name: 'storageDoornum', index: "storage_doornum", width: 75},
             {
                 label: '是否到期', name: 'isExpire', index: "is_expire", width: 75, formatter: function (value) {
-                    return value === 0?
+                    return value === 0 ?
                         '<span>是</span>' :
                         '<span>否</span>'
                 }
@@ -30,25 +30,18 @@ $(function () {
             {label: '创建时间', name: 'createTime', index: "create_time", width: 85},
             {
                 label: '申请状态', name: 'itsmStatus', index: "itsm_status", width: 75, formatter: function (value) {
-                    if(value === -1){
-                        return '<span>草稿</span>' ;
-                    }else if (value === 1){
-                        return '<span>流转中</span>' ;
-                    }else if (value === 2){
-                        return '<span>办结</span>' ;
-                    }else if (value === 3){
-                        return '<span>作废</span>' ;
+                    if (value === -1) {
+                        return '<span>草稿</span>';
+                    } else if (value === 1) {
+                        return '<span>流转中</span>';
+                    } else if (value === 2) {
+                        return '<span>办结</span>';
+                    } else if (value === 3) {
+                        return '<span>作废</span>';
                     }
 
                 }
             },
-            // {
-            //     label: '是否启用', name: 'isqy', index: "isqy", width: 75, formatter: function (value, options, row) {
-            //         return value === 0 ?
-            //             '<span class="label label-danger">禁用</span>' :
-            //             '<span class="label label-success">启用</span>'
-            //     }
-            // },
         ],
         viewrecords: true,
         height: 425,
@@ -77,33 +70,45 @@ $(function () {
             $("#jqGrid").closest(".ui-jqgrid-bdiv").css({"overflow-x": "hidden"});
         }
     });
+
 });
 
 var vm = new Vue({
     el: '#pmpapp',
     data: {
         q: {
-            moldName: null
+            storageName: null
         },
+
         showList: true,
         title: null,
-        moldList: {},
-        mold: {
+        storageList: {},
+        storage: {
             id: null,
-            moldName: null,
-            moldCode: null,
-            moldImg: null,
-            orderNum: 0,
-            isqy: 1,
-            categoryId: ''
-
+            storageCode: null,
+            storageName: null,
+            storageArea: null,
+            rentTime: null,
+            staRentDate:null,
+            endRentDate:null,
+            rentPrice: null,
+            renterName: null,
+            renterPhone: null,
+            landlordName: null,
+            landlordPhone: null,
+            storageDoornum: null
         },
-        selected: '-1',
-        dataList: []
+        selected: -1,
+        selected2: -1,
+        UserDataList:[],
+
     },
 
     created() {
-        this.getCategory();
+        this.getUserInfo();
+    },
+    mounted: function() {
+        this.dateInit()
     },
     //请求方法
     methods: {
@@ -118,38 +123,57 @@ var vm = new Vue({
             vm.showList = true;
             var page = $("#jqGrid").jqGrid('getGridParam', 'page');
             $("#jqGrid").jqGrid('setGridParam', {
-                postData: {'search': vm.q.moldName},  //postData是post请求参数Data
+                postData: {'search': vm.q.storageName},  //postData是post请求参数Data
                 page: page
             }).trigger("reloadGrid");
         },
 
         //重置
         reset: function () {
-            window.location.href = baseURL + "modules/proc/procMold.html";
+            window.location.href = baseURL + "modules/proc/procStorageApply.html";
         },
 
         //进入新增
         add: function () {
             vm.showList = false;
             vm.title = "新增";
-            vm.moldList = {};
-            vm.mold = {
+            vm.storageList = {};
+            vm.storage = {
                 id: null,
-                moldName: null,
-                moldCode: null,
-                moldImg: null,
-                isqy: 1,
+                storageCode: null,
+                storageName: null,
+                storageArea: null,
+                rentTime: null,
+                staRentDate:null,
+                endRentDate:null,
+                rentPrice: null,
+                renterName: null,
+                renterId: null,
+                renterPhone: null,
+                landlordName: null,
+                landlordId: null,
+                landlordPhone: null,
+                storageDoornum: null,
+                storageAddress: null
             }
-            vm.selected = '-1';
         },
-        //获得商品类别
-        getCategory() {
-            $.get(baseURL + "proc/procMold/getCategory/", function (r) {
-                vm.dataList = r.data;
-                //vm.selected = r.data[0].value;  //默认选第一个
+
+        dateInit: function() {
+            $('#startTime').datetimepicker({
+                format: 'YYYY-MM-DD'
+            })
+            $('#endTime').datetimepicker({
+                format: 'YYYY-MM-DD'
             })
         },
 
+        //获得用户信息
+        getUserInfo() {
+            $.get(baseURL + "proc/procStorage/getUsersInfomation/", function (r) {
+               console.log(r);
+             vm.UserDataList =   r.data;
+            })
+        },
         //进入修改
         update: function () {
             var id = getSelectedRow();
@@ -165,9 +189,8 @@ var vm = new Vue({
 
         //获取详情
         getInfo: function (id) {
-            $.get(baseURL + "proc/procMold/info/" + id, function (r) {
-                vm.mold = r.data.mold;
-                vm.selected = r.data.mold.categoryId;
+            $.get(baseURL + "proc/procStorage/info/" + id, function (r) {
+                vm.storage = r.data.storage;
             });
         },
         //删除
@@ -182,7 +205,7 @@ var vm = new Vue({
                 console.log(data);
                 $.ajax({
                     type: "POST",
-                    url: baseURL + "proc/procMold/delete",
+                    url: baseURL + "proc/procStorage/delete",
                     contentType: "application/json",
                     data: data,
                     success: function (r) {
@@ -198,22 +221,44 @@ var vm = new Vue({
             });
         },
 
+
+        changeRenter:function (userid){
+            vm.storage.renterId= userid;
+            $.get(baseURL + "sys/user/getSelUserinfo/" + userid, function (r) {
+               vm.storage.renterPhone= r.data.user.mobile;
+            });
+        },
+        landlorder:function (userid){
+            vm.storage.landlordId= userid;
+            $.get(baseURL + "sys/user/getSelUserinfo/" + userid, function (r) {
+                vm.storage.landlordPhone= r.data.user.mobile;
+            });
+        },
+
         //保存-更新数据
         saveOrUpdate: function () {
-            var url = vm.mold.id == null ? "proc/procMold/save" : "proc/procMold/update";
-            vm.mold.categoryId = (vm.selected == -1 ? '' : vm.selected);
-            console.log(vm.mold)
-
+            var url = vm.storage.id == null ? "proc/procStorage/save" : "proc/procStorage/update";
+            vm.storage.staRentDate = $('#startTime').val();
+            vm.storage.endRentDate = $('#endTime').val();
+            console.log(vm.storage)
             //isNumber校验是否为数字， common.js中
-            if (!isNumber(vm.mold.orderNum)) {
-                layer.alert("排序应为数字！");
+            if (!isNumber(vm.storage.storageArea)) {
+                layer.alert("仓库面积应为数字！");
+                return false;
+            }
+            if (!isNumber(vm.storage.rentTime)) {
+                layer.alert("租期应为数字！");
+                return false;
+            }
+            if (!isNumber(vm.storage.rentPrice)) {
+                layer.alert("租金应为数字！");
                 return false;
             }
             $.ajax({
                 type: "POST",
                 url: baseURL + url,
                 contentType: "application/json",
-                data: JSON.stringify(vm.mold),
+                data: JSON.stringify(vm.storage),
                 success: function (r) {
                     if (r.code === 0) {
                         alert('操作成功', function () {
@@ -224,7 +269,31 @@ var vm = new Vue({
                     }
                 }
             });
+        },
+        //提交工作流申请
+        applyStorage: function () {
+            var id = 'aaaaaa';
+            console.log(id);
+            $.get(baseURL + "/proc/procStorage/apply?" + id, function (r) {
+                console.log(r);
+            });
+        },
+        flowView: function () {
+            console.log("流程查看")
+            var imgHtml = "<img src= 'https://images.gitbook.cn/d58fbc40-b33b-11e9-8857-a9cfb47d2814'/>";
+            layer.open({
+                type: 1,
+                offset: '30px',
+                skin: 'layui-layer-molv',
+                title: "流程查看",
+                area: ['800px', '600px'],
+                shade: 0,
+                shadeClose: false,
+                content: imgHtml,
+                btn: ['取消']
+            });
         }
+
 
     }
 });

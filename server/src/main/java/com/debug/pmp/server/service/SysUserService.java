@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.debug.pmp.common.utils.PageUtil;
 import com.debug.pmp.model.entity.SysUserEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,6 +26,8 @@ public interface SysUserService extends IService<SysUserEntity>{
     void deleteUser(Long[] ids);
 
     void updatePsd(Long[] ids);
+
+    List<Map<String, String>> getUserNamePhone();
 }
 
 

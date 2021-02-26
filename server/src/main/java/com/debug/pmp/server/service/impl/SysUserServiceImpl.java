@@ -8,26 +8,21 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.debug.pmp.common.utils.Constant;
 import com.debug.pmp.common.utils.PageUtil;
 import com.debug.pmp.common.utils.QueryUtil;
-import com.debug.pmp.model.entity.SysDeptEntity;
-import com.debug.pmp.model.entity.SysUserEntity;
-import com.debug.pmp.model.entity.SysUserPostEntity;
-import com.debug.pmp.model.entity.SysUserRoleEntity;
+import com.debug.pmp.model.entity.*;
 import com.debug.pmp.model.mapper.SysUserDao;
 import com.debug.pmp.server.service.SysDeptService;
 import com.debug.pmp.server.service.SysUserPostService;
 import com.debug.pmp.server.service.SysUserRoleService;
 import com.debug.pmp.server.service.SysUserService;
 import com.debug.pmp.server.shiro.ShiroUtil;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -202,6 +197,22 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao,SysUserEntity> im
                 this.update(entity,new QueryWrapper<SysUserEntity>().eq("user_id",uId));
             }
         }
+    }
+
+
+    @Override
+    public List<Map<String, String>> getUserNamePhone() {
+        QueryWrapper<SysUserEntity> queryWrapper = new QueryWrapper<SysUserEntity>().orderByAsc("user_id");
+        List<SysUserEntity> userList = list(queryWrapper);
+        List<Map<String,String>> list  = new ArrayList<>();
+        for (SysUserEntity userEntity : userList) {
+            Map<String ,String > userMap = Maps.newHashMap();
+            userMap.put("value",userEntity.getUserId().toString());
+            userMap.put("text",userEntity.getName());
+            userMap.put("phone",userEntity.getMobile());
+            list.add(userMap);
+        }
+        return list;
     }
 }
 

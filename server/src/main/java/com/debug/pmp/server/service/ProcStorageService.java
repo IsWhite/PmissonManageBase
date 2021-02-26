@@ -17,4 +17,6 @@ import java.util.Map;
 public interface ProcStorageService extends IService<ProcStorageEntity> {
 
     PageUtil queryPage(Map<String, Object> paramMap);
+
+    void saveStorage(ProcStorageEntity procStorageEntity);
 }
