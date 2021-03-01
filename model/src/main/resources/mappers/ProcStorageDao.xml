@@ -30,4 +30,9 @@
         <result column="isqy" property="isqy" />
     </resultMap>
 
+<!--    deleteByIds-->
+    <delete id="deleteByIds">
+        DELETE FROM  proc_storage  WHERE id IN (${ids})
+    </delete>
+
 </mapper>

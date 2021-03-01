@@ -6,6 +6,7 @@ import com.debug.pmp.common.response.StatusCode;
 import com.debug.pmp.common.utils.PageUtil;
 import com.debug.pmp.common.utils.ValidatorUtil;
 import com.debug.pmp.model.entity.ProcStorageEntity;
+import com.debug.pmp.server.annotation.LogAnnotation;
 import com.debug.pmp.server.service.ProcStorageService;
 
 import com.debug.pmp.server.service.SysUserService;
@@ -27,6 +28,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.xml.ws.Response;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +62,7 @@ public class ProcStorageController extends AbstractController {
     private TaskService taskService;
 
     /************工作流**************/
-    //列表
+    //仓库申请列表
     @RequestMapping(value = "/applyList")
     @RequiresPermissions("proc:procStorageApply:list")
     public BaseResponse appliList(@RequestParam Map<String, Object> paramMap) {
@@ -71,7 +73,6 @@ public class ProcStorageController extends AbstractController {
             PageUtil page = storageService.queryPage(paramMap);
             log.info("列表数据{}", page);
             resMap.put("page", page);
-
         } catch (Exception e) {
             response = new BaseResponse(StatusCode.Fail.getCode(), e.getMessage());
         }
@@ -81,7 +82,9 @@ public class ProcStorageController extends AbstractController {
 
 
     //保存
+    @LogAnnotation("保存仓库")
     @RequestMapping(value = "/save")
+    @RequiresPermissions("proc:procStorageApply:save")
     public BaseResponse save(@RequestBody @Validated ProcStorageEntity procStorageEntity, BindingResult bindingResult){
         String res = ValidatorUtil.checkResult(bindingResult);
         if (StringUtils.isNotBlank(res)) {
@@ -92,28 +95,72 @@ public class ProcStorageController extends AbstractController {
         try {
          log.info("保存仓库提交的表单{}",procStorageEntity);
          storageService.saveStorage(procStorageEntity);
-
-
         }catch (Exception e){
             response  = new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());
         }
-
         return response;
     }
 
     //获得所有用户的 id ,姓名， 和手机号(下拉选-用户)
     @RequestMapping(value = "/getUsersInfomation")
+    @RequiresPermissions("proc:procStorageApply:getUser")
     public BaseResponse getUsersInfomation(){
         BaseResponse response = new BaseResponse(StatusCode.Success);
         try{
             List<Map<String,String>> userNamePhone = userService.getUserNamePhone();
             response.setData(userNamePhone);
-
         }catch (Exception e){
             response = new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());
         }
         return response;
     }
+
+    //表单详情
+    @RequestMapping(value = "/info/{id}",method = RequestMethod.GET)
+    @RequiresPermissions("proc:procStorageApply:info ")
+    public BaseResponse getInfo(@PathVariable String  id){
+        BaseResponse response = new BaseResponse(StatusCode.Success);
+        try {
+            log.info("id为{}",id);
+            ProcStorageEntity entity = storageService.getInfoById(id);
+            Map<String ,Object> reMaps = Maps.newHashMap();
+            reMaps.put("storage",entity);
+            response.setData(reMaps);
+        }catch (Exception e){
+            response = new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());
+        }
+        return response;
+    }
+
+    //修改
+    @RequestMapping(value = "/update",method = RequestMethod.POST)
+    @RequiresPermissions("proc:procStorageApply:update")
+    public BaseResponse update(@RequestBody @Validated ProcStorageEntity storageEntity){
+        BaseResponse response = new BaseResponse(StatusCode.Success);
+        try {
+            log.info("修改提交的表单{}",storageEntity);
+            storageService.updateStorage(storageEntity);
+        }catch (Exception e){
+            response = new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());
+        }
+        return response;
+    }
+
+    //删除
+    @RequestMapping(value = "/delete",method = RequestMethod.POST)
+    @RequiresPermissions("proc:procStorageApply:delete")
+    public BaseResponse delete(@RequestBody @Validated List<String> ids){
+        BaseResponse response = new BaseResponse(StatusCode.Success);
+        try {
+            log.info("删除的ids{}" ,ids);
+            storageService.deleteByIds(ids);
+        }catch (Exception e){
+            response  =  new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());
+        }
+        return response;
+    }
+
+
 
 
     //申请仓库
@@ -122,7 +169,6 @@ public class ProcStorageController extends AbstractController {
         log.info("申请{}", "申请");
         BaseResponse response = new BaseResponse(StatusCode.Success);
         try {
-
             ActivitiUtil activitiUtil = new ActivitiUtil();
             //创建流程引擎
             ProcessEngine processEngine = activitiUtil.getProcessEngine();

@@ -4,10 +4,9 @@ package com.debug.pmp.server.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.debug.pmp.common.response.StatusCode;
+import com.debug.pmp.common.utils.CommonUtil;
 import com.debug.pmp.common.utils.PageUtil;
 import com.debug.pmp.common.utils.QueryUtil;
-import com.debug.pmp.model.entity.ProcCategoryEntity;
-import com.debug.pmp.model.entity.ProcMoldEntity;
 import com.debug.pmp.model.entity.ProcStorageEntity;
 import com.debug.pmp.model.entity.SysUserEntity;
 import com.debug.pmp.model.mapper.ProcStorageDao;
@@ -20,6 +19,7 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -36,6 +36,7 @@ public class ProcStorageServiceImpl extends ServiceImpl<ProcStorageDao, ProcStor
 
     @Autowired
     private SysUserService sysUserService;
+
 
     @Override
     public PageUtil queryPage(Map<String, Object> paramMap) {
@@ -60,9 +61,17 @@ public class ProcStorageServiceImpl extends ServiceImpl<ProcStorageDao, ProcStor
                 createrUser = sysUserService.getById(storageEntity.getCreaterId());
                 renterUser = sysUserService.getById(storageEntity.getRenterId());
                 landlordUser= sysUserService.getById(storageEntity.getLandlordId());
-                storageEntity.setCreaterName(createrUser.getName());
-                storageEntity.setRenterName(renterUser.getName());
-                storageEntity.setLandlordName(landlordUser.getName());
+                if (createrUser != null) {
+                    storageEntity.setCreaterName(createrUser.getName());
+                }
+
+                if (renterUser != null) {
+                    storageEntity.setRenterName(renterUser.getName());
+                }
+                if (landlordUser != null) {
+                    storageEntity.setLandlordName(landlordUser.getName());
+                }
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -82,6 +91,43 @@ public class ProcStorageServiceImpl extends ServiceImpl<ProcStorageDao, ProcStor
         procStorageEntity.setCreaterId(userId);
         procStorageEntity.setCreateTime(DateTime.now().toDate());
         save(procStorageEntity);
+
+
+    }
+
+    @Override
+    public ProcStorageEntity getInfoById(String id) {
+
+        ProcStorageEntity procStorageEntity = this.getById(id);
+//
+//        Long renterUserId = sysUserService.getById(procStorageEntity.getRenterId()).getUserId();
+//        Long landlordUserId = sysUserService.getById(procStorageEntity.getLandlordId()).getUserId();
+
+
+        return procStorageEntity;
+    }
+
+    @Override
+    public void updateStorage(ProcStorageEntity storageEntity) {
+        String oldCode = this.getById(storageEntity.getId()).getStorageCode();
+        if (oldCode != null && !oldCode.equals(storageEntity.getStorageCode())) {
+           String  code =   storageEntity.getStorageCode();
+            QueryWrapper<ProcStorageEntity> wrapper = new QueryWrapper<ProcStorageEntity>().eq("storage_code",code);
+            ProcStorageEntity en = this.getOne(wrapper);
+            if (en != null){
+                throw new RuntimeException(StatusCode.PostCodeHasExist.getMsg());
+            }
+        }
+        storageEntity.setReviserTime(DateTime.now().toDate());
+        this.updateById(storageEntity);
+    }
+
+    //删除
+    @Override
+    public void deleteByIds(List<String> ids) {
+        String idsStr = StringUtils.join(ids,",");
+        String sqlIds = CommonUtil.concatStrToChar(idsStr, ",");
+        baseMapper.deleteByIds(sqlIds);
 
 
     }

@@ -4,6 +4,7 @@ import com.debug.pmp.common.utils.PageUtil;
 import com.debug.pmp.model.entity.ProcStorageEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,4 +20,10 @@ public interface ProcStorageService extends IService<ProcStorageEntity> {
     PageUtil queryPage(Map<String, Object> paramMap);
 
     void saveStorage(ProcStorageEntity procStorageEntity);
+
+    ProcStorageEntity getInfoById(String id);
+
+    void updateStorage(ProcStorageEntity storageEntity);
+
+    void deleteByIds(List<String> ids);
 }

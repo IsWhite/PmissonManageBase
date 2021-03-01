@@ -13,4 +13,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface ProcStorageDao extends BaseMapper<ProcStorageEntity> {
 
+    void deleteByIds(String sqlIds);
 }

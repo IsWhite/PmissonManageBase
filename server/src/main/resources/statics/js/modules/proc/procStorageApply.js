@@ -92,14 +92,14 @@ var vm = new Vue({
             staRentDate:null,
             endRentDate:null,
             rentPrice: null,
-            renterName: null,
+            renterId: null,
             renterPhone: null,
-            landlordName: null,
+            landlordId: null,
             landlordPhone: null,
             storageDoornum: null
         },
-        selected: -1,
-        selected2: -1,
+        selected: '-1',
+        selected2: '-1',
         UserDataList:[],
 
     },
@@ -156,8 +156,10 @@ var vm = new Vue({
                 storageDoornum: null,
                 storageAddress: null
             }
+            vm.selected = '-1';
+            vm.selected2 = '-1';
         },
-
+        //时间控件初始化
         dateInit: function() {
             $('#startTime').datetimepicker({
                 format: 'YYYY-MM-DD'
@@ -169,7 +171,7 @@ var vm = new Vue({
 
         //获得用户信息
         getUserInfo() {
-            $.get(baseURL + "proc/procStorage/getUsersInfomation/", function (r) {
+            $.get(baseURL + "proc/procStorage/getUsersInfomation", function (r) {
                console.log(r);
              vm.UserDataList =   r.data;
             })
@@ -190,7 +192,12 @@ var vm = new Vue({
         //获取详情
         getInfo: function (id) {
             $.get(baseURL + "proc/procStorage/info/" + id, function (r) {
+                console.log(r.data.storage);
                 vm.storage = r.data.storage;
+                vm.selected = r.data.storage.renterId;
+                vm.selected2 = r.data.storage.landlordId;
+                $('#endTime').val(r.data.storage.staRentDate);
+                $('#startTime').val(r.data.storage.endRentDate);
             });
         },
         //删除
@@ -220,14 +227,14 @@ var vm = new Vue({
                 });
             });
         },
-
-
+        //获取用户信息
         changeRenter:function (userid){
             vm.storage.renterId= userid;
             $.get(baseURL + "sys/user/getSelUserinfo/" + userid, function (r) {
                vm.storage.renterPhone= r.data.user.mobile;
             });
         },
+        //获取用户信息
         landlorder:function (userid){
             vm.storage.landlordId= userid;
             $.get(baseURL + "sys/user/getSelUserinfo/" + userid, function (r) {
@@ -254,6 +261,23 @@ var vm = new Vue({
                 layer.alert("租金应为数字！");
                 return false;
             }
+            if (vm.selected == -1){
+                layer.alert("请选择租户！");
+                return false;
+            }
+            if (vm.selected2 == -1){
+                layer.alert("请选择房东！");
+                return false;
+            }
+            if ( $('#startTime').val() == ""){
+                layer.alert("起租日期不能为空！");
+                return false;
+            }
+            if ($('#endTime').val() == ""){
+                layer.alert("到期日期不能为空！");
+                return false;
+            }
+
             $.ajax({
                 type: "POST",
                 url: baseURL + url,

@@ -100,6 +100,7 @@ public class ProcStorageEntity implements Serializable {
     private String contractUrl;
 
     @ApiModelProperty(value = "仓库地址")
+    @NotBlank(message ="仓库地址不能为空!" )
     private String storageAddress;
 
     @ApiModelProperty(value = "仓库门牌号")
