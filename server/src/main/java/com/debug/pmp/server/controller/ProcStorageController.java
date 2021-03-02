@@ -19,6 +19,7 @@ import org.activiti.engine.TaskService;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
@@ -29,15 +30,14 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.xml.ws.Response;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import java.io.File;
+import java.io.InputStream;
+import java.util.*;
 
 
 /**
  * <p>
- * 前端控制器
+ * 前端控制器  仓库管理
  * </p>
  *
  * @author pawell
@@ -58,8 +58,8 @@ public class ProcStorageController extends AbstractController {
     @Autowired
     private RuntimeService runtimeService;
 
-    @Autowired
-    private TaskService taskService;
+    //@Autowired
+    //private TaskService taskService;
 
     /************工作流**************/
     //仓库申请列表
@@ -102,9 +102,9 @@ public class ProcStorageController extends AbstractController {
     }
 
     //获得所有用户的 id ,姓名， 和手机号(下拉选-用户)
-    @RequestMapping(value = "/getUsersInfomation")
+    @RequestMapping(value = "/getUsersInfo",method = RequestMethod.GET)
     @RequiresPermissions("proc:procStorageApply:getUser")
-    public BaseResponse getUsersInfomation(){
+    public BaseResponse getUsersInfo(){
         BaseResponse response = new BaseResponse(StatusCode.Success);
         try{
             List<Map<String,String>> userNamePhone = userService.getUserNamePhone();
@@ -167,6 +167,10 @@ public class ProcStorageController extends AbstractController {
     @RequestMapping(value = "/apply")
     public BaseResponse apply() {
         log.info("申请{}", "申请");
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("applyUser", "employee1"); //申请人名称 --- 对应表 act_ru_variable的，_NAME ,_TEXT字段
+        variables.put("days", 3); //请假天数
+
         BaseResponse response = new BaseResponse(StatusCode.Success);
         try {
             ActivitiUtil activitiUtil = new ActivitiUtil();
@@ -175,14 +179,59 @@ public class ProcStorageController extends AbstractController {
             //部署流程定义文件
             ProcessDefinition processDefinition = activitiUtil.deployment(processEngine);
             //启动运行流程
-             activitiUtil.getProcessInstance(processEngine, processDefinition);
-            Map<String, Object> variables = new HashMap<>();
-            variables.put("applyUser", "employee1"); //申请人名称 --- 对应表 act_ru_variable的，_NAME ,_TEXT字段
-            variables.put("days", 3); //请假天数
-            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProcess_1", variables);
-            //assertNotNull(processInstance);
-            System.out.println("pid=" + processInstance.getId() + ", pdid=" + processInstance.getProcessDefinitionId());
+             activitiUtil.getProcessInstance(processEngine, processDefinition,variables);
+            //通过Key启动工作流
+           // ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProcess_1", variables);
+//            System.out.println("流程实例ID" + processInstance.getId() + ", 流程定义ID" + processInstance.getProcessDefinitionId());
+          /*********************************************************************************************************************/
+            List<ProcessDefinition> list = processEngine.getRepositoryService()//
+                    .createProcessDefinitionQuery()//
+                    .orderByProcessDefinitionVersion().asc()// 使用流程定义的版本升序排列
+                    .list();
+            /**
+             * Map<String,ProcessDefinition> map集合的key：流程定义的key map集合的value：流程定义的对象
+             * map集合的特点：当map集合key值相同的情况下，后一次的值将替换前一次的值
+             */
+            Map<String, ProcessDefinition> map = new LinkedHashMap<String, ProcessDefinition>();
+            if (list != null && list.size() > 0) {
+                for (ProcessDefinition pd : list) {
+                    map.put(pd.getKey(), pd);
+                }
+            }
+            List<ProcessDefinition> pdList = new ArrayList<ProcessDefinition>(map.values());
+            if (pdList != null && pdList.size() > 0) {
+                for (ProcessDefinition pd : pdList) {
+                    System.out.println("流程定义ID:" + pd.getId());// 流程定义的key+版本+随机生成数
+                    System.out.println("流程定义的名称:" + pd.getName());// 对应helloworld.bpmn文件中的name属性值
+                    System.out.println("流程定义的key:" + pd.getKey());// 对应helloworld.bpmn文件中的id属性值
+                    System.out.println("流程定义的版本:" + pd.getVersion());// 当流程定义的key值相同的相同下，版本升级，默认1
+                    System.out.println("资源名称bpmn文件:" + pd.getResourceName());
+                    System.out.println("资源名称png文件:" + pd.getDiagramResourceName());
+                    System.out.println("部署对象ID：" + pd.getDeploymentId());
+                    System.out.println("#########################################################");
+                }
+            }
+         /*********************************************************************************************************************/
+            System.out.println("这个是部署对象ID：" +processDefinition.getDeploymentId());
+            ProcessInstance process = processEngine.getRuntimeService()// 表示正在执行的流程实例和执行对象
+                    .createProcessInstanceQuery()// 创建流程实例查询
+                    .processInstanceId(processDefinition.getDeploymentId())// 使用流程实例ID查询
+                    .singleResult();
+            if (process == null) {
+                System.out.println("流程已经结束");
+            } else {
+                System.out.println("流程没有结束");
+            }
+            /*********************************************************************************************************************/
+            /** 将生成图片放到文件夹下 */
+           //ActivitiUtil.flowPicture(processEngine,"65001"); //好用
+            /*********************************************************************************************************************/
+
+            /*********************************************************************************************************************/
+
+
         } catch (Exception e) {
+
             response = new BaseResponse(StatusCode.Fail.getCode(), e.getMessage());
         }
         return response;

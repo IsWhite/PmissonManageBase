@@ -4,7 +4,22 @@
     <title>产品类型</title>
     <#include "/header.html">
 </head>
+<style>
+    .layui-layer-molv .layui-layer-title {
+        background: #0f94e7;
+        color: #fff;
+        border: none;
+    }
+    .layui-layer-molv .layui-layer-btn a {
+        background: #0f94e7;
+    }
+    .layui-layer-molv .layui-layer-btn .layui-layer-btn1 {
+        background:  #0f94e7;
+        color:  white;
+    }
+</style>
 <body>
+
 <div id="pmpapp" v-cloak>
     <div v-show="showList">
         <div class="grid-btn">
@@ -117,9 +132,9 @@
             <div class="form-group">
                 <div class="col-sm-2 control-label"></div>
                 <input type="button" class="btn btn-primary" @click="saveOrUpdate" value="保存"/>
-                <input type="button" class="btn btn-primary" @click="saveOrUpdate" value="提交"/>
-                <input type="button" class="btn btn-primary" @click="flowView" value="流程查看"/>
-                <input type="button" class="btn btn-primary" @click="flowView" value="流转记录"/>
+                <input type="button" class="btn btn-primary" @click="applyStorage" value="提交"/>
+                <input type="button" class="btn btn-primary" @click="submitModel" value="提交弹出框"/>
+<!--                <input type="button" class="btn btn-primary" @click="flowView" value="流转记录"/>-->
                 <input type="button" class="btn btn-warning" @click="reload" value="返回"/>
             </div>
         </form>

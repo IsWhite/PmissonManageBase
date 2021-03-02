@@ -9,8 +9,15 @@ import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Author Administrator
@@ -57,11 +64,47 @@ public class ActivitiUtil {
         return processDefinition;
     }
 
-    public static ProcessInstance getProcessInstance(ProcessEngine processEngine, ProcessDefinition processDefinition) {
+    public static ProcessInstance getProcessInstance(ProcessEngine processEngine, ProcessDefinition processDefinition, Map<String, Object> variables) {
         // 启动流程并返回流程实例
         RuntimeService runtimeService = processEngine.getRuntimeService();
-        ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId(),variables);
         LOGGER.info("启动流程【{}】",processInstance.getProcessDefinitionKey());
         return processInstance;
+    }
+
+
+    /***************************生成流程图片******************************/
+    public static  void  flowPicture( ProcessEngine processEngine,String deploymentId) throws IOException {
+        ProcessInstance process = processEngine.getRuntimeService()// 表示正在执行的流程实例和执行对象
+                .createProcessInstanceQuery()// 创建流程实例查询
+                .processInstanceId("流程实例ID")// 使用流程实例ID查询
+                .singleResult();
+        if (process == null) {
+            System.out.println("流程已经结束");
+        } else {
+            System.out.println("流程没有结束");
+        }
+        /** 将生成图片放到文件夹下 */
+        //String deploymentId = "50001";// 流程部署ID     就是部署对象ID
+        // 获取图片资源名称
+        List<String> listDown = processEngine.getRepositoryService()//
+                .getDeploymentResourceNames(deploymentId);// 流程部署ID
+        // 定义图片资源的名称
+        String resourceName = "图片资源的名称";
+        if (listDown != null && listDown.size() > 0) {
+            for (String name : listDown) {
+                if (name.indexOf(".png") >= 0) {
+                    resourceName = name;
+                }
+            }
+        }
+        // 获取图片的输入流
+        InputStream in = processEngine.getRepositoryService()//
+                .getResourceAsStream(deploymentId, resourceName);
+        // 将图片生成到D盘的目录下
+        File file = new File("C:/Users/Administrator/Desktop/新建文件夹diagrams/" + resourceName);
+        // 将输入流的图片写到D盘下
+        FileUtils.copyInputStreamToFile(in, file);
+        /*****************************生成流程图片*********************************************************/
     }
 }
