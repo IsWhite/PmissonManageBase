@@ -89,8 +89,8 @@ var vm = new Vue({
             storageName: null,
             storageArea: null,
             rentTime: null,
-            staRentDate:null,
-            endRentDate:null,
+            staRentDate: null,
+            endRentDate: null,
             rentPrice: null,
             renterId: null,
             renterPhone: null,
@@ -100,14 +100,14 @@ var vm = new Vue({
         },
         selected: '-1',
         selected2: '-1',
-        UserDataList:[],
+        UserDataList: [],
 
     },
 
     created() {
         this.getUserInfo();
     },
-    mounted: function() {
+    mounted: function () {
         this.dateInit()
     },
     //请求方法
@@ -144,8 +144,8 @@ var vm = new Vue({
                 storageName: null,
                 storageArea: null,
                 rentTime: null,
-                staRentDate:null,
-                endRentDate:null,
+                staRentDate: null,
+                endRentDate: null,
                 rentPrice: null,
                 renterName: null,
                 renterId: null,
@@ -160,7 +160,7 @@ var vm = new Vue({
             vm.selected2 = '-1';
         },
         //时间控件初始化
-        dateInit: function() {
+        dateInit: function () {
             $('#startTime').datetimepicker({
                 format: 'YYYY-MM-DD'
             })
@@ -171,9 +171,9 @@ var vm = new Vue({
 
         //获得用户信息
         getUserInfo() {
-            $.get(baseURL + "proc/procStorage/getUsersInfomation", function (r) {
-               console.log(r);
-             vm.UserDataList =   r.data;
+            $.get(baseURL + "proc/procStorage/getUsersInfo", function (r) {
+                console.log(r);
+                vm.UserDataList = r.data;
             })
         },
         //进入修改
@@ -228,17 +228,17 @@ var vm = new Vue({
             });
         },
         //获取用户信息
-        changeRenter:function (userid){
-            vm.storage.renterId= userid;
+        changeRenter: function (userid) {
+            vm.storage.renterId = userid;
             $.get(baseURL + "sys/user/getSelUserinfo/" + userid, function (r) {
-               vm.storage.renterPhone= r.data.user.mobile;
+                vm.storage.renterPhone = r.data.user.mobile;
             });
         },
         //获取用户信息
-        landlorder:function (userid){
-            vm.storage.landlordId= userid;
+        landlorder: function (userid) {
+            vm.storage.landlordId = userid;
             $.get(baseURL + "sys/user/getSelUserinfo/" + userid, function (r) {
-                vm.storage.landlordPhone= r.data.user.mobile;
+                vm.storage.landlordPhone = r.data.user.mobile;
             });
         },
 
@@ -261,19 +261,19 @@ var vm = new Vue({
                 layer.alert("租金应为数字！");
                 return false;
             }
-            if (vm.selected == -1){
+            if (vm.selected == -1) {
                 layer.alert("请选择租户！");
                 return false;
             }
-            if (vm.selected2 == -1){
+            if (vm.selected2 == -1) {
                 layer.alert("请选择房东！");
                 return false;
             }
-            if ( $('#startTime').val() == ""){
+            if ($('#startTime').val() == "") {
                 layer.alert("起租日期不能为空！");
                 return false;
             }
-            if ($('#endTime').val() == ""){
+            if ($('#endTime').val() == "") {
                 layer.alert("到期日期不能为空！");
                 return false;
             }
@@ -316,6 +316,108 @@ var vm = new Vue({
                 content: imgHtml,
                 btn: ['取消']
             });
+        },
+        submitModel: function () {
+            $.get(baseURL + "proc/procStorage/getUsersInfo", {}, function (r) {
+                console.log(r);
+                var _html = "";
+                if (r.data.length > 0) {
+                    for (let i = 0; i < r.data.length; i++) {
+                        _html += "<option  value='" + r.data[i].value + "'>" + r.data[i].text + "</option>\n";
+                    }
+                }
+
+                //提交申请弹出框
+                layer.open({
+                    type: 1,
+                    offset: '30px',
+                    skin: 'layui-layer-molv',
+                    title: "提交申请",
+                    area: ['800px', '400px'],
+                    shade: 0,
+                    shadeClose: false,
+                    content:
+                        "  <div class='theForm' style='margin-top: 10px'>\n" +
+                        "           <div class='form-group'>\n" +
+                        "                <div class='col-sm-2 control-label'>处理意见</div>\n" +
+                        "                <div class='col-sm-12' style='margin-top: 20px'>\n" +
+                        "                    <textarea  id='textS' style='height: 150px' type='text' class='form-control'/>\n" +
+                        "                </div>\n" +
+                        "            </div>" +
+                        "   </div>           " +
+
+                        "   <div class='form-group'>\n" +
+                        "            <div class='col-sm-2 control-label' style='margin-top: 20px'>请选择处理人</div>\n" +
+                        "                 <select class='col-sm-2 form-control' id='selUser' style='margin-top: 20px' >\n" +
+                        "                    <option  value='-1' >---请选择---</option>\n" +
+                        _html +
+                        "                </select>\n" +
+                        "   </div>\n",
+                    btn: ['确定', '取消'],
+                    success: function(layero, index){
+                        //找到它的子窗口的body
+                        var body = layer.getChildFrame('body', index);  //巧妙的地方在这里哦
+                        //为子窗口元素赋值
+
+                    },
+                    yes:function (){
+                        var url = vm.storage.id == null ? "proc/procStorage/saveApply" : "proc/procStorage/updateApply";
+                       // vm.storage.auditOpinion =  $("#textS").val();
+                       // vm.storage.applier =  $("#selUser").val();
+                        if (!isNumber(vm.storage.storageArea)) {
+                            layer.alert("仓库面积应为数字！");
+                            return false;
+                        }
+                        if (!isNumber(vm.storage.rentTime)) {
+                            layer.alert("租期应为数字！");
+                            return false;
+                        }
+                        if (!isNumber(vm.storage.rentPrice)) {
+                            layer.alert("租金应为数字！");
+                            return false;
+                        }
+                        if (vm.selected == -1) {
+                            layer.alert("请选择租户！");
+                            return false;
+                        }
+                        if (vm.selected2 == -1) {
+                            layer.alert("请选择房东！");
+                            return false;
+                        }
+                        if ($('#startTime').val() == "") {
+                            layer.alert("起租日期不能为空！");
+                            return false;
+                        }
+                        if ($('#endTime').val() == "") {
+                            layer.alert("到期日期不能为空！");
+                            return false;
+                        }
+                        var  applyData = {};
+                        applyData.storage = vm.storage;
+                        applyData.auditOpinion =  $("#textS").val();
+                        applyData.applier =  $("#selUser").val();
+                        console.log("提交",applyData);
+                        $.ajax({
+                            type: "POST",
+                            url: baseURL + url,
+                            contentType: "application/json",
+                            data: JSON.stringify(applyData),
+                            success: function (r) {
+                                if (r.code === 0) {
+                                    alert('操作成功', function () {
+                                        vm.reload();
+                                    });
+                                } else {
+                                    alert(r.msg);
+                                }
+                            }
+                        });
+                    }
+
+                });
+            });
+
+
         }
 
 

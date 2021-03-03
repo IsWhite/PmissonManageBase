@@ -1,6 +1,7 @@
 package com.debug.pmp.server.controller;
 
 
+import com.alibaba.fastjson.JSON;
 import com.debug.pmp.common.response.BaseResponse;
 import com.debug.pmp.common.response.StatusCode;
 import com.debug.pmp.common.utils.PageUtil;
@@ -12,14 +13,10 @@ import com.debug.pmp.server.service.ProcStorageService;
 import com.debug.pmp.server.service.SysUserService;
 import com.debug.pmp.server.util.ActivitiUtil;
 import com.google.common.collect.Maps;
-import org.activiti.engine.HistoryService;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
@@ -29,9 +26,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.xml.ws.Response;
-import java.io.File;
-import java.io.InputStream;
 import java.util.*;
 
 
@@ -161,7 +155,27 @@ public class ProcStorageController extends AbstractController {
     }
 
 
+    //仓库申请-保存
+    @LogAnnotation("仓库申请")
+    @RequestMapping(value = "/saveApply")
+    @RequiresPermissions("proc:procStorageApply:saveApply")
+    public BaseResponse saveApply(@RequestBody  Map<String ,Object> applyMap){
+        BaseResponse response = new BaseResponse(StatusCode.Success);
+        try {
 
+            log.info("仓库申请{}",applyMap);
+            ProcStorageEntity procStorageEntity = JSON.parseObject(JSON.toJSONString(applyMap.get("storage")), ProcStorageEntity.class);
+            log.info("仓库申请procStorageEntity{}",procStorageEntity);
+            log.info("仓库申请auditOpinion{}",applyMap.get("auditOpinion"));
+            log.info("仓库申请applier{}",applyMap.get("applier"));
+            storageService.saveStorage(procStorageEntity);
+            System.out.println(procStorageEntity);
+
+        }catch (Exception e){
+            response  = new BaseResponse(StatusCode.Fail.getCode(),e.getMessage());
+        }
+        return response;
+    }
 
     //申请仓库
     @RequestMapping(value = "/apply")
